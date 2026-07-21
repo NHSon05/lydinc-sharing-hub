@@ -29,9 +29,12 @@ export default function Home() {
         {/* Quick action card */}
         <div className="w-full max-w-md p-6 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 backdrop-blur-xl hover:border-zinc-700/50 transition-all duration-300 shadow-2xl">
           <div className="flex flex-col gap-3">
-            <button className="w-full py-3 px-4 rounded-xl bg-white text-zinc-950 font-semibold hover:bg-zinc-150 transition-colors shadow-lg shadow-white/5 cursor-pointer">
+            <a
+              href="/dashboard"
+              className="w-full py-3 px-4 rounded-xl bg-white text-zinc-950 font-semibold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5 cursor-pointer inline-block"
+            >
               Access Workspace
-            </button>
+            </a>
             <div className="h-px bg-zinc-800/60 my-2" />
             <p className="text-xs text-zinc-500">
               Authorized personnel only. Activities are logged.
