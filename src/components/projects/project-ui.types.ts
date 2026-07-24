@@ -46,6 +46,13 @@ export type ManagerOption = {
   role: 'ADMIN' | 'MANAGER' | 'MEMBER';
 };
 
+export type UserOption = {
+  id: string;
+  name: string;
+  email: string;
+  department: { id: string; name: string };
+};
+
 export type ProjectPaginationInfo = {
   page: number;
   pageSize: number;

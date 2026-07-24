@@ -35,6 +35,13 @@ enum TaskStatus {
   CANCELLED
 }
 
+enum ProjectMemberRole {
+  OWNER
+  MANAGER
+  MEMBER
+  VIEWER
+}
+
 enum TaskPriority {
   LOW
   MEDIUM
@@ -127,7 +134,11 @@ model ProjectMember {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
 
-  joinedAt DateTime @default(now())
+  role     ProjectMemberRole @default(MEMBER)
+  joinedAt DateTime          @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([projectId, userId])
   @@index([projectId])

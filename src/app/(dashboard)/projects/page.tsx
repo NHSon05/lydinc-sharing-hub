@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { listProjects } from '@/modules/projects/project.service';
 import { listDepartments } from '@/modules/departments/department.service';
 import { ProjectPageClient } from '@/components/projects/project-page-client';
-import type { DepartmentOption, ManagerOption, ProjectItem } from '@/components/projects/project-ui.types';
+import type { DepartmentOption, ManagerOption, ProjectItem, UserOption } from '@/components/projects/project-ui.types';
 
 type PageProps = {
   searchParams: Promise<{
@@ -37,7 +37,7 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
   const userRole = session.user.role as 'ADMIN' | 'MANAGER' | 'MEMBER';
 
   // Fetch initial paginated projects
-  const [projectsResult, deptsResult, managersResult] = await Promise.all([
+  const [projectsResult, deptsResult, managersResult, usersResult] = await Promise.all([
     listProjects({
       actor: session.user,
       query: {
@@ -63,6 +63,24 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
         id: true,
         name: true,
         role: true,
+      },
+      orderBy: { name: 'asc' },
+    }),
+    // Fetch all active users for member selection
+    db.user.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: { name: 'asc' },
     }),
@@ -109,11 +127,19 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
     role: m.role as 'ADMIN' | 'MANAGER' | 'MEMBER',
   }));
 
+  const users: UserOption[] = usersResult.map((u) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    department: u.department ?? { id: '', name: '' },
+  }));
+
   return (
     <ProjectPageClient
       initialProjects={projects}
       departments={departments}
       managers={managers}
+      users={users}
       pagination={projectsResult.pagination}
       userId={userId}
       userRole={userRole}

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ProjectStatus } from '@/generated/prisma/client';
+import { ProjectStatus, ProjectMemberRole } from '@/generated/prisma/client';
 
 export const projectListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -37,6 +37,15 @@ export const createProjectSchema = z
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
     status: z.nativeEnum(ProjectStatus).default(ProjectStatus.PLANNING),
+    members: z
+      .array(
+        z.object({
+          userId: z.string().min(1),
+          role: z.nativeEnum(ProjectMemberRole).default(ProjectMemberRole.MEMBER),
+        })
+      )
+      .optional()
+      .default([]),
   })
   .refine((data) => data.startDate <= data.endDate, {
     message: 'Ngày kết thúc không được nhỏ hơn ngày bắt đầu',

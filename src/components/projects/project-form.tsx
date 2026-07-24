@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import type { DepartmentOption, ManagerOption } from './project-ui.types';
+import React, { useState, useMemo } from 'react';
+import type { DepartmentOption, ManagerOption, UserOption } from './project-ui.types';
+import { MEMBER_ROLE_OPTIONS } from './ui.types';
 
 export type ProjectFormData = {
   code: string;
@@ -11,12 +12,14 @@ export type ProjectFormData = {
   managerId: string;
   startDate: string;
   endDate: string;
+  members: { userId: string; role: string }[];
 };
 
 interface ProjectFormProps {
   initialValues?: Partial<ProjectFormData>;
   departments: DepartmentOption[];
   managers: ManagerOption[];
+  users?: UserOption[];
   isCreateMode?: boolean;
   onSubmit: (data: ProjectFormData) => Promise<void>;
   onCancel: () => void;
@@ -29,6 +32,7 @@ export function ProjectForm({
   initialValues = {},
   departments,
   managers,
+  users,
   isCreateMode = false,
   onSubmit,
   onCancel,
@@ -71,6 +75,46 @@ export function ProjectForm({
     formatDateForInput(initialValues.startDate) || new Date().toISOString().split('T')[0]
   );
   const [endDate, setEndDate] = useState(getInitialEndDate());
+
+  // Member selection state (create mode only)
+  const [memberSearch, setMemberSearch] = useState('');
+  const [selectedMembers, setSelectedMembers] = useState<
+    { userId: string; role: string }[]
+  >([]);
+
+  // Filter users based on search input
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    const query = memberSearch.toLowerCase().trim();
+    if (!query) return users;
+    return users.filter(
+      (u) =>
+        u.name.toLowerCase().includes(query) ||
+        u.email.toLowerCase().includes(query) ||
+        u.department?.name?.toLowerCase().includes(query)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- users is a prop that changes with parent re-render
+  }, [memberSearch, users]);
+
+  // Remove manager from available member list (manager auto-added on server)
+  const availableUsers = useMemo(
+    () => filteredUsers.filter((u) => u.id !== managerId),
+    [filteredUsers, managerId]
+  );
+
+  const toggleMember = (userId: string) => {
+    setSelectedMembers((prev) => {
+      const exists = prev.find((m) => m.userId === userId);
+      if (exists) return prev.filter((m) => m.userId !== userId);
+      return [...prev, { userId, role: 'MEMBER' }];
+    });
+  };
+
+  const updateMemberRole = (userId: string, role: string) => {
+    setSelectedMembers((prev) =>
+      prev.map((m) => (m.userId === userId ? { ...m, role } : m))
+    );
+  };
 
   const [codeError, setCodeError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
@@ -142,6 +186,7 @@ export function ProjectForm({
       // Map back to full ISO string
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
+      members: selectedMembers,
     });
   };
 
@@ -329,6 +374,96 @@ export function ProjectForm({
         <p className="text-[11px] text-rose-400 font-medium">
           {dateError}
         </p>
+      )}
+
+      {/* Member selection (create mode only) */}
+      {isCreateMode && users && (
+        <div className="space-y-3 pt-2 border-t border-zinc-800/60">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-semibold text-zinc-200">
+              Thành viên dự án
+            </h3>
+            <span className="text-[11px] text-zinc-500">
+              Đã chọn: {selectedMembers.length} thành viên
+            </span>
+          </div>
+
+          {/* Search filter */}
+          <div>
+            <input
+              type="text"
+              value={memberSearch}
+              onChange={(e) => setMemberSearch(e.target.value)}
+              placeholder="Tìm kiếm thành viên..."
+              className="w-full px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-colors"
+            />
+          </div>
+
+          {/* User list */}
+          <div className="space-y-1 rounded-xl border border-zinc-800 p-1.5 max-h-48 overflow-y-auto">
+            {availableUsers.length === 0 ? (
+              <div className="p-3 text-xs text-zinc-500 text-center">
+                {memberSearch
+                  ? 'Không tìm thấy thành viên phù hợp.'
+                  : 'Không còn thành viên nào để thêm.'}
+              </div>
+            ) : (
+              availableUsers.map((user) => {
+                const isSelected = selectedMembers.some(
+                  (m) => m.userId === user.id
+                );
+                const member = selectedMembers.find(
+                  (m) => m.userId === user.id
+                );
+
+                return (
+                  <div
+                    key={user.id}
+                    className={`flex items-center gap-3 p-2.5 rounded-xl text-xs transition-colors ${
+                      isSelected
+                        ? 'bg-purple-500/10 border border-purple-500/30'
+                        : 'bg-zinc-950 border border-transparent hover:bg-zinc-800/50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleMember(user.id)}
+                      className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-purple-600 focus:ring-purple-500 cursor-pointer shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-zinc-100 truncate">
+                        {user.name}
+                      </div>
+                      <div className="text-zinc-500 truncate">
+                        {user.email}
+                        {user.department?.name && (
+                          <span> &middot; {user.department.name}</span>
+                        )}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <select
+                        value={member?.role || 'MEMBER'}
+                        onChange={(e) =>
+                          updateMemberRole(user.id, e.target.value)
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                        className="px-2 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-purple-500 transition-colors cursor-pointer shrink-0"
+                      >
+                        {MEMBER_ROLE_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
       )}
 
       {/* Action buttons */}

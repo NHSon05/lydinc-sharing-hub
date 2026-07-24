@@ -105,6 +105,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   return (
     <ProjectDetailClient
       project={project}
+      projectId={projectId}
       departments={departments}
       managers={managers}
       userId={session.user.id}

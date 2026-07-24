@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { DepartmentOption, ManagerOption, ProjectItem, ProjectPaginationInfo } from './project-ui.types';
+import type { DepartmentOption, ManagerOption, ProjectItem, ProjectPaginationInfo, UserOption } from './project-ui.types';
 import { ProjectPageHeader } from './project-page-header';
 import { ProjectToolbar } from './project-toolbar';
 import { ProjectTable } from './project-table';
@@ -17,6 +17,7 @@ interface ProjectPageClientProps {
   initialProjects: ProjectItem[];
   departments: DepartmentOption[];
   managers: ManagerOption[];
+  users?: UserOption[];
   pagination: ProjectPaginationInfo;
   userId: string;
   userRole: 'ADMIN' | 'MANAGER' | 'MEMBER';
@@ -30,6 +31,7 @@ export function ProjectPageClient({
   initialProjects,
   departments,
   managers,
+  users,
   pagination,
   userId,
   userRole,
@@ -102,6 +104,7 @@ export function ProjectPageClient({
           isOpen={isCreateOpen}
           departments={departments}
           managers={managers}
+          users={users}
           onClose={() => setIsCreateOpen(false)}
           onSuccess={(msg) => addToast('success', msg)}
         />

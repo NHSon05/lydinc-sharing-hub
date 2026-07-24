@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 import type { SessionUser } from '@/modules/auth/auth.types';
-import { ProjectStatus, type Prisma } from '@/generated/prisma/client';
+import { ProjectStatus, ProjectMemberRole, type Prisma } from '@/generated/prisma/client';
 import {
   assertCanCreateProject,
   assertCanDeleteProject,
@@ -119,6 +119,27 @@ export async function createProjectService({
   }
 
   return db.$transaction(async (tx) => {
+    // Build members list: manager is always included
+    const memberSet = new Map<string, { userId: string; role: ProjectMemberRole }>();
+
+    // Manager auto-added with MANAGER role
+    memberSet.set(validated.managerId, {
+      userId: validated.managerId,
+      role: ProjectMemberRole.MANAGER,
+    });
+
+    // Add members from request
+    if (validated.members) {
+      for (const m of validated.members) {
+        if (!memberSet.has(m.userId)) {
+          memberSet.set(m.userId, {
+            userId: m.userId,
+            role: m.role,
+          });
+        }
+      }
+    }
+
     // Create project
     const project = await createProject(
       {
@@ -131,10 +152,10 @@ export async function createProjectService({
         department: { connect: { id: validated.departmentId } },
         manager: { connect: { id: validated.managerId } },
         createdBy: { connect: { id: actor.id } },
-        // Manager automatically becomes project member
+        // Add all members
         members: {
-          create: {
-            userId: validated.managerId,
+          createMany: {
+            data: Array.from(memberSet.values()),
           },
         },
       },
@@ -152,6 +173,7 @@ export async function createProjectService({
           name: project.name,
           managerId: project.managerId,
           departmentId: project.departmentId,
+          memberCount: memberSet.size,
         },
         actorId: actor.id,
       },

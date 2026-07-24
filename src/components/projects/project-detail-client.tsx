@@ -8,23 +8,36 @@ import { ProjectProgress } from './project-progress';
 import { EditProjectDialog } from './edit-project-dialog';
 import { ChangeProjectStatusDialog } from './change-project-status-dialog';
 import { DeleteProjectDialog } from './delete-project-dialog';
+import { MembersTab } from './members/members-tab';
+import { ProjectTasksTab } from './tasks/project-tasks-tab';
 import { ToastContainer, type ToastMessage } from '@/components/ui/toast';
+
+type TabId = 'overview' | 'members' | 'tasks';
 
 interface ProjectDetailClientProps {
   project: ProjectItem;
+  projectId: string;
   departments: DepartmentOption[];
   managers: ManagerOption[];
   userId: string;
   userRole: 'ADMIN' | 'MANAGER' | 'MEMBER';
 }
 
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'overview', label: 'Tổng quan' },
+  { id: 'members', label: 'Thành viên' },
+  { id: 'tasks', label: 'Nhiệm vụ' },
+];
+
 export function ProjectDetailClient({
   project,
+  projectId,
   departments,
   managers,
   userId,
   userRole,
 }: ProjectDetailClientProps) {
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
   const [statusChangingProject, setStatusChangingProject] = useState<ProjectItem | null>(null);
   const [deletingProject, setDeletingProject] = useState<ProjectItem | null>(null);
@@ -55,6 +68,14 @@ export function ProjectDetailClient({
   const totalTasks = project.taskSummary?.total ?? 0;
   const completedTasks = project.taskSummary?.completed ?? 0;
   const calculatedProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  const projectOption = {
+    id: project.id,
+    code: project.code,
+    name: project.name,
+    endDate: project.endDate,
+    status: project.status,
+  };
 
   return (
     <div className="space-y-6">
@@ -113,108 +134,142 @@ export function ProjectDetailClient({
         )}
       </div>
 
-      {/* Main Grid Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column: Overview Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Card: description */}
-          <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-3">
-            <h3 className="text-sm font-bold text-white">Mô tả dự án</h3>
-            <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap">
-              {project.description || <span className="text-zinc-500 italic">Chưa có mô tả chi tiết cho dự án này.</span>}
-            </p>
-          </div>
-
-          {/* Placeholders for future modules: Members, Tasks, Activity Logs */}
-          <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-4">
-            <div className="border-b border-zinc-800 pb-3">
-              <h3 className="text-sm font-bold text-white">Các module liên kết</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/40 flex flex-col justify-between h-28">
-                <div>
-                  <h4 className="text-xs font-semibold text-zinc-200">Nhiệm vụ (Tasks)</h4>
-                  <p className="text-[10px] text-zinc-500 mt-1">Quản lý Kanban board và phân công công việc.</p>
-                </div>
-                <div className="text-xs font-bold text-purple-400 font-mono">
-                  {totalTasks} Nhiệm vụ
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/40 flex flex-col justify-between h-28">
-                <div>
-                  <h4 className="text-xs font-semibold text-zinc-200">Thành viên (Members)</h4>
-                  <p className="text-[10px] text-zinc-500 mt-1">Danh sách nhân sự tham gia dự án.</p>
-                </div>
-                <div className="text-xs font-bold text-purple-400 font-mono">
-                  {project.memberCount} Thành viên
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/40 flex flex-col justify-between h-28 opacity-60">
-                <div>
-                  <h4 className="text-xs font-semibold text-zinc-400">Hoạt động (Activity Logs)</h4>
-                  <p className="text-[10px] text-zinc-600 mt-1">Lịch sử thay đổi và cập nhật dự án.</p>
-                </div>
-                <span className="text-[10px] text-zinc-500 italic">Sắp ra mắt</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right column: Summary metadata cards */}
-        <div className="space-y-6">
-          {/* Card: stats */}
-          <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-4">
-            <h3 className="text-sm font-bold text-white border-b border-zinc-800 pb-2">Thông tin chung</h3>
-            
-            <div className="space-y-3.5 text-xs">
-              <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
-                <span className="text-zinc-400 font-medium">Bộ phận phụ trách</span>
-                <span className="font-semibold text-zinc-100">{project.department?.name || 'Không xác định'}</span>
-              </div>
-
-              <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
-                <span className="text-zinc-400 font-medium">Người quản lý</span>
-                <span className="font-semibold text-zinc-100">{project.manager?.name || 'Chưa phân công'}</span>
-              </div>
-
-              <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
-                <span className="text-zinc-400 font-medium">Người tạo dự án</span>
-                <span className="font-semibold text-zinc-100">{project.createdBy?.name || '-'}</span>
-              </div>
-
-              <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
-                <span className="text-zinc-400 font-medium">Ngày bắt đầu</span>
-                <span className="font-mono text-zinc-200">{formatDate(project.startDate)}</span>
-              </div>
-
-              <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
-                <span className="text-zinc-400 font-medium">Hạn kết thúc</span>
-                <span className="font-mono text-zinc-200">{formatDate(project.endDate)}</span>
-              </div>
-
-              <div className="flex items-center justify-between py-1">
-                <span className="text-zinc-400 font-medium">Ngày khởi tạo</span>
-                <span className="font-mono text-zinc-200">{formatDate(project.createdAt)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card: progress */}
-          <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-4">
-            <h3 className="text-sm font-bold text-white border-b border-zinc-800 pb-2">Tiến trình thực hiện</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-zinc-400 mb-1">
-                <span>Nhiệm vụ hoàn thành</span>
-                <span className="font-mono font-bold text-zinc-200">{completedTasks}/{totalTasks}</span>
-              </div>
-              <ProjectProgress progress={calculatedProgress} />
-            </div>
-          </div>
-        </div>
+      {/* Tabs */}
+      <div className="flex items-center gap-1 border-b border-zinc-800">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2.5 text-xs font-semibold transition-colors rounded-t-lg cursor-pointer ${
+              activeTab === tab.id
+                ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-500/5'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left column: Overview Info */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Card: description */}
+            <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-3">
+              <h3 className="text-sm font-bold text-white">Mô tả dự án</h3>
+              <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                {project.description || <span className="text-zinc-500 italic">Chưa có mô tả chi tiết cho dự án này.</span>}
+              </p>
+            </div>
+
+            {/* Stats summary cards */}
+            <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-4">
+              <div className="border-b border-zinc-800 pb-3">
+                <h3 className="text-sm font-bold text-white">Tổng quan dự án</h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/40 flex flex-col justify-between h-28">
+                  <div>
+                    <h4 className="text-xs font-semibold text-zinc-200">Nhiệm vụ</h4>
+                    <p className="text-[10px] text-zinc-500 mt-1">Quản lý Kanban board và phân công công việc.</p>
+                  </div>
+                  <div className="text-xs font-bold text-purple-400 font-mono">
+                    {totalTasks} Nhiệm vụ
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/40 flex flex-col justify-between h-28">
+                  <div>
+                    <h4 className="text-xs font-semibold text-zinc-200">Thành viên</h4>
+                    <p className="text-[10px] text-zinc-500 mt-1">Danh sách nhân sự tham gia dự án.</p>
+                  </div>
+                  <div className="text-xs font-bold text-purple-400 font-mono">
+                    {project.memberCount} Thành viên
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-950/40 flex flex-col justify-between h-28 opacity-60">
+                  <div>
+                    <h4 className="text-xs font-semibold text-zinc-400">Hoạt động</h4>
+                    <p className="text-[10px] text-zinc-600 mt-1">Lịch sử thay đổi và cập nhật dự án.</p>
+                  </div>
+                  <span className="text-[10px] text-zinc-500 italic">Sắp ra mắt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column: Summary metadata cards */}
+          <div className="space-y-6">
+            {/* Card: stats */}
+            <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-4">
+              <h3 className="text-sm font-bold text-white border-b border-zinc-800 pb-2">Thông tin chung</h3>
+
+              <div className="space-y-3.5 text-xs">
+                <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
+                  <span className="text-zinc-400 font-medium">Bộ phận phụ trách</span>
+                  <span className="font-semibold text-zinc-100">{project.department?.name || 'Không xác định'}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
+                  <span className="text-zinc-400 font-medium">Người quản lý</span>
+                  <span className="font-semibold text-zinc-100">{project.manager?.name || 'Chưa phân công'}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
+                  <span className="text-zinc-400 font-medium">Người tạo dự án</span>
+                  <span className="font-semibold text-zinc-100">{project.createdBy?.name || '-'}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
+                  <span className="text-zinc-400 font-medium">Ngày bắt đầu</span>
+                  <span className="font-mono text-zinc-200">{formatDate(project.startDate)}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-zinc-800/40">
+                  <span className="text-zinc-400 font-medium">Hạn kết thúc</span>
+                  <span className="font-mono text-zinc-200">{formatDate(project.endDate)}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-zinc-400 font-medium">Ngày khởi tạo</span>
+                  <span className="font-mono text-zinc-200">{formatDate(project.createdAt)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: progress */}
+            <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900/20 backdrop-blur-md space-y-4">
+              <h3 className="text-sm font-bold text-white border-b border-zinc-800 pb-2">Tiến trình thực hiện</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-zinc-400 mb-1">
+                  <span>Nhiệm vụ hoàn thành</span>
+                  <span className="font-mono font-bold text-zinc-200">{completedTasks}/{totalTasks}</span>
+                </div>
+                <ProjectProgress progress={calculatedProgress} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'members' && (
+        <MembersTab projectId={projectId} canManage={canManage} />
+      )}
+
+      {activeTab === 'tasks' && (
+        <ProjectTasksTab
+          projectId={projectId}
+          project={projectOption}
+          userId={userId}
+          userRole={userRole}
+          canManage={canManage}
+        />
+      )}
 
       {/* Edit Dialog */}
       <EditProjectDialog

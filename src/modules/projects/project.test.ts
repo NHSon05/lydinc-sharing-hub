@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { ProjectStatus } from '@/generated/prisma/client';
-import { AccountStatusError, AuthorizationError } from '@/lib/errors';
 import {
   canCreateProject,
   canDeleteProject,
@@ -10,8 +9,6 @@ import {
 import {
   createProjectSchema,
   projectListQuerySchema,
-  updateProjectSchema,
-  updateProjectStatusSchema,
 } from './project.schema';
 import { toProjectDTO } from './project.mapper';
 
@@ -144,7 +141,7 @@ describe('Project Mapper Tests', () => {
       department: { id: 'dept-1', name: 'Dept Name', description: null, createdAt: now, updatedAt: now },
       manager: { id: 'mgr-1', name: 'Manager Name', email: 'mgr@mail.com', passwordHash: '', role: 'MANAGER' as const, status: 'ACTIVE' as const, departmentId: 'dept-1', createdAt: now, updatedAt: now },
       createdBy: { id: 'creator-1', name: 'Creator Name', email: 'creator@mail.com', passwordHash: '', role: 'ADMIN' as const, status: 'ACTIVE' as const, departmentId: 'dept-1', createdAt: now, updatedAt: now },
-      members: [{ id: 'm-1', projectId: 'proj-123', userId: 'mgr-1', joinedAt: now }],
+      members: [{ id: 'm-1', projectId: 'proj-123', userId: 'mgr-1', role: 'MANAGER' as const, joinedAt: now, createdAt: now, updatedAt: now }],
       tasks: [
         { id: 't-1', title: 'Task 1', description: null, status: 'COMPLETED' as const, priority: 'MEDIUM' as const, progress: 100, startDate: null, dueDate: now, completedAt: now, result: null, projectId: 'proj-123', assigneeId: 'mgr-1', createdById: 'creator-1', createdAt: now, updatedAt: now },
         { id: 't-2', title: 'Task 2', description: null, status: 'TODO' as const, priority: 'MEDIUM' as const, progress: 0, startDate: null, dueDate: now, completedAt: null, result: null, projectId: 'proj-123', assigneeId: 'mgr-1', createdById: 'creator-1', createdAt: now, updatedAt: now },

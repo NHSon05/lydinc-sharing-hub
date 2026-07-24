@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectForm, type ProjectFormData } from './project-form';
-import type { DepartmentOption, ManagerOption } from './project-ui.types';
+import type { DepartmentOption, ManagerOption, UserOption } from './project-ui.types';
 
 interface CreateProjectDialogProps {
   isOpen: boolean;
   departments: DepartmentOption[];
   managers: ManagerOption[];
+  users?: UserOption[];
   onClose: () => void;
   onSuccess: (message: string) => void;
 }
@@ -17,6 +18,7 @@ export function CreateProjectDialog({
   isOpen,
   departments,
   managers,
+  users,
   onClose,
   onSuccess,
 }: CreateProjectDialogProps) {
@@ -66,9 +68,9 @@ export function CreateProjectDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
       <div
-        className="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4 my-8"
+        className="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4 my-8 max-h-[90vh] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-proj-title"
@@ -93,6 +95,7 @@ export function CreateProjectDialog({
         <ProjectForm
           departments={departments}
           managers={managers}
+          users={users}
           isCreateMode={true}
           onSubmit={handleSubmit}
           onCancel={onClose}
