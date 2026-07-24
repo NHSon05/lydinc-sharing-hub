@@ -59,8 +59,18 @@ export default async function DashboardPage() {
       title: 'Dự án đang chạy',
       value: activeProjectsCount,
       icon: (
-        <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2" />
+        <svg
+          className="w-6 h-6 text-purple-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"
+          />
         </svg>
       ),
       bg: 'bg-purple-500/5 border-purple-500/10',
@@ -69,8 +79,18 @@ export default async function DashboardPage() {
       title: 'Tổng số nhiệm vụ',
       value: totalTasksCount,
       icon: (
-        <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          className="w-6 h-6 text-blue-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       ),
       bg: 'bg-blue-500/5 border-blue-500/10',
@@ -79,8 +99,18 @@ export default async function DashboardPage() {
       title: 'Đang chờ duyệt',
       value: reviewTasksCount,
       icon: (
-        <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          className="w-6 h-6 text-amber-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       ),
       bg: 'bg-amber-500/5 border-amber-500/10',
@@ -89,8 +119,18 @@ export default async function DashboardPage() {
       title: 'Nhiệm vụ quá hạn',
       value: overdueTasksCount,
       icon: (
-        <svg className="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg
+          className="w-6 h-6 text-rose-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
         </svg>
       ),
       bg: 'bg-rose-500/5 border-rose-500/10',
@@ -101,13 +141,14 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Top Banner section */}
       <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/20 p-6 sm:p-8">
-        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-600/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-75 h-75 bg-purple-600/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 space-y-2">
           <h2 className="text-2xl font-bold tracking-tight text-white">
             Chào mừng trở lại, {user.name}!
           </h2>
           <p className="text-sm text-zinc-400 max-w-xl">
-            Hệ thống LYDINC TaskHub giúp bạn kiểm soát dự án và công việc một cách trực quan, tối ưu hóa quy trình cộng tác nội bộ.
+            Hệ thống LYDINC TaskHub giúp bạn kiểm soát dự án và công việc một
+            cách trực quan, tối ưu hóa quy trình cộng tác nội bộ.
           </p>
         </div>
       </div>
@@ -139,7 +180,10 @@ export default async function DashboardPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
               Dự án mới cập nhật
             </h3>
-            <Link href="/projects" className="text-xs font-semibold text-purple-400 hover:text-purple-300">
+            <Link
+              href="/projects"
+              className="text-xs font-semibold text-purple-400 hover:text-purple-300"
+            >
               Xem tất cả →
             </Link>
           </div>
@@ -152,8 +196,12 @@ export default async function DashboardPage() {
                   className="p-4 rounded-xl border border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/30 hover:border-zinc-700/50 transition-all flex items-center justify-between"
                 >
                   <div className="space-y-1">
-                    <p className="text-xs font-mono text-zinc-500">{project.code}</p>
-                    <p className="text-sm font-semibold text-zinc-200">{project.name}</p>
+                    <p className="text-xs font-mono text-zinc-500">
+                      {project.code}
+                    </p>
+                    <p className="text-sm font-semibold text-zinc-200">
+                      {project.name}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
                     <span className="text-zinc-500">
@@ -166,7 +214,9 @@ export default async function DashboardPage() {
                 </div>
               ))
             ) : (
-              <p className="text-xs text-zinc-500 text-center py-6">Chưa có dự án nào được tạo.</p>
+              <p className="text-xs text-zinc-500 text-center py-6">
+                Chưa có dự án nào được tạo.
+              </p>
             )}
           </div>
         </div>
@@ -178,7 +228,10 @@ export default async function DashboardPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
               Nhiệm vụ sắp đến hạn
             </h3>
-            <Link href="/tasks" className="text-xs font-semibold text-blue-400 hover:text-blue-300">
+            <Link
+              href="/tasks"
+              className="text-xs font-semibold text-blue-400 hover:text-blue-300"
+            >
               Xem tất cả →
             </Link>
           </div>
@@ -191,7 +244,9 @@ export default async function DashboardPage() {
                   className="p-4 rounded-xl border border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/30 hover:border-zinc-700/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold text-zinc-200">{task.title}</p>
+                    <p className="text-sm font-semibold text-zinc-200">
+                      {task.title}
+                    </p>
                     <div className="flex items-center gap-2 text-xs text-zinc-500">
                       <span>{task.project.name}</span>
                       <span>•</span>
@@ -202,20 +257,24 @@ export default async function DashboardPage() {
                     <span className="text-xs text-zinc-400 font-medium">
                       Hạn: {new Date(task.dueDate).toLocaleDateString('vi-VN')}
                     </span>
-                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-semibold border uppercase ${
-                      task.priority === 'URGENT'
-                        ? 'bg-rose-500/10 border-rose-500/20 text-rose-400'
-                        : task.priority === 'HIGH'
-                        ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                        : 'bg-zinc-800 border-zinc-700 text-zinc-400'
-                    }`}>
+                    <span
+                      className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-semibold border uppercase ${
+                        task.priority === 'URGENT'
+                          ? 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                          : task.priority === 'HIGH'
+                            ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                            : 'bg-zinc-800 border-zinc-700 text-zinc-400'
+                      }`}
+                    >
                       {task.priority}
                     </span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-zinc-500 text-center py-6">Không có nhiệm vụ sắp đến hạn.</p>
+              <p className="text-xs text-zinc-500 text-center py-6">
+                Không có nhiệm vụ sắp đến hạn.
+              </p>
             )}
           </div>
         </div>
